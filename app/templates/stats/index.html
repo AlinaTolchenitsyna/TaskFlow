@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📊 Статистика</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <canvas id="pieChart"></canvas>
+    </div>
+    <div class="col-md-6">
+        <canvas id="lineChart"></canvas>
+    </div>
+</div>
+
+<hr>
+<p>
+    Всего задач: <b>{{ total }}</b><br>
+    Выполнено: <b>{{ done }}</b><br>
+    Открытые: <b>{{ open_tasks }}</b>
+</p>
+
+<!-- Подключаем Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Круговая диаграмма
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['Выполнено', 'Открытые'],
+            datasets: [{
+                data: [{{ done }}, {{ open_tasks }}],
+                backgroundColor: ['#28a745', '#dc3545'],
+            }]
+        }
+    });
+
+    // Линейный график (последние 7 дней)
+    const ctxLine = document.getElementById('lineChart').getContext('2d');
+    new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: {{ days | tojson }},
+            datasets: [{
+                label: 'Завершенные задачи',
+                data: {{ daily_counts | tojson }},
+                borderColor: '#007bff',
+                fill: false,
+                tension: 0.2
+            }]
+        }
+    });
+</script>
+{% endblock %}

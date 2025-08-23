@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Мои задачи</h2>
+    <div>
+        <a href="{{ url_for('main.tasks', show='all') }}" class="btn btn-outline-secondary btn-sm {% if show=='all' %}active{% endif %}">Все</a>
+        <a href="{{ url_for('main.tasks', show='open') }}" class="btn btn-outline-secondary btn-sm {% if show=='open' %}active{% endif %}">Открытые</a>
+        <a href="{{ url_for('main.tasks', show='done') }}" class="btn btn-outline-secondary btn-sm {% if show=='done' %}active{% endif %}">Выполненные</a>
+    </div>
+</div>
+
+<!-- форма создания задачи -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('main.create_task') }}">
+            {{ form.hidden_tag() }}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    {{ form.title(class="form-control", placeholder="Название задачи") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.deadline(class="form-control") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.priority(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.category_id(class="form-select") }}
+                </div>
+                <div class="col-md-1 d-grid">
+                    <button type="submit" class="btn btn-success">+</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- список задач -->
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Задача</th>
+            <th>Дедлайн</th>
+            <th>Приоритет</th>
+            <th>Категория</th>
+            <th>Статус</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for task in tasks %}
+        <tr class="{% if task.is_done %}table-success{% endif %}">
+            <td>{{ task.title }}</td>
+            <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
+            <td>
+                {% if task.priority == 3 %}
+                    🔴 Высокий
+                {% elif task.priority == 2 %}
+                    🟡 Средний
+                {% else %}
+                    🟢 Низкий
+                {% endif %}
+            </td>
+            <td>{{ task.category.name if task.category else "-" }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('main.toggle_task', task_id=task.id) }}">
+    {{ empty_form.hidden_tag() }}
+    <button type="submit" class="btn btn-sm {% if task.is_done %}btn-outline-secondary{% else %}btn-outline-success{% endif %}">
+        {% if task.is_done %}Открыть{% else %}Выполнить{% endif %}
+    </button>
+</form>
+            </td>
+            <td class="text-end">
+                <a href="{{ url_for('main.edit_task', task_id=task.id) }}" class="btn btn-sm btn-primary">✏️</a>
+                <form method="POST" action="{{ url_for('main.delete_task', task_id=task.id) }}" style="display:inline;">
+    {{ empty_form.hidden_tag() }}
+    <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+</form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if not tasks %}
+    <p class="text-muted">Задач пока нет. Добавьте первую!</p>
+{% endif %}
+{% endblock %}

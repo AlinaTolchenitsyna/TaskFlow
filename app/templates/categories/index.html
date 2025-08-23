@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Категории</h2>
+
+<form method="POST" class="mb-3">
+    {{ form.hidden_tag() }}
+    <div class="input-group">
+        {{ form.name(class="form-control", placeholder="Название категории") }}
+        <button type="submit" class="btn btn-success">Добавить</button>
+    </div>
+</form>
+
+<ul class="list-group">
+    {% for c in categories %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ c.name }}
+            <form method="POST" action="{{ url_for('main.delete_category', category_id=c.id) }}" style="margin:0;">
+    {{ empty_form.hidden_tag() }}
+    <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+</form>
+        </li>
+    {% endfor %}
+</ul>
+
+{% if not categories %}
+    <p class="text-muted mt-3">Категорий пока нет.</p>
+{% endif %}
+{% endblock %}
