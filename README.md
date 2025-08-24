@@ -32,3 +32,10 @@ docker run -p 5000:5000 taskflow
 docker ps
 docker stop <CONTAINER_ID>
 ```
+
+## Скриншоты
+### Список задач
+![Список задач](screenshots/tasks.png)
+
+### Статистика
+![Статистика](screenshots/stats.png)
