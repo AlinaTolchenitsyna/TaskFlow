@@ -18,22 +18,19 @@ csrf = CSRFProtect()
 auth_bp = Blueprint(
     "auth", 
     __name__, 
-    template_folder="templates"  # ищет внутри app/templates/
+    template_folder="templates"  
 )
-
-# from . import auth_routes  # сюда вынести функции view
 
 def create_app():
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object(Config)
 
-    # Инициализация расширений
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)
 
-    # Регистрация блюпринтов
+
     from .routes import main_bp
     app.register_blueprint(main_bp)
 

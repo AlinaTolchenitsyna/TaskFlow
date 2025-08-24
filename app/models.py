@@ -55,7 +55,6 @@ class Task(db.Model):
     description = db.Column(db.Text, nullable=True)
     deadline = db.Column(db.DateTime, nullable=True)
 
-    # приоритет: 1=low, 2=medium, 3=high
     priority = db.Column(db.Integer, default=2, nullable=False)
 
     is_done = db.Column(db.Boolean, default=False, nullable=False)
@@ -75,7 +74,6 @@ class Task(db.Model):
     def __repr__(self):
         return f"<Task {self.title} done={self.is_done}>"
 
-# Авто-установка completed_at при пометке выполненной
 @event.listens_for(Task.is_done, "set")
 def set_completed_at(target, value, oldvalue, initiator):
     if value is True and oldvalue is not True:

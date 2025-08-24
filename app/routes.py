@@ -42,7 +42,6 @@ def categories():
 @login_required
 def delete_category(category_id):
     cat = Category.query.filter_by(id=category_id, user_id=current_user.id).first_or_404()
-    # Снимаем связь у задач этой категории
     Task.query.filter_by(user_id=current_user.id, category_id=cat.id).update({Task.category_id: None})
     db.session.delete(cat)
     db.session.commit()
@@ -56,10 +55,10 @@ def delete_category(category_id):
 def tasks():
     form = TaskForm()
     categories = Category.query.filter_by(user_id=current_user.id).order_by(Category.name.asc()).all()
-    # choices: 0 — без категории
+
     form.category_id.choices = [(0, "Без категории")] + [(c.id, c.name) for c in categories]
 
-    show = request.args.get("show", "all")  # all|open|done
+    show = request.args.get("show", "all")  
     q = Task.query.filter_by(user_id=current_user.id)
     if show == "open":
         q = q.filter_by(is_done=False)
@@ -95,7 +94,6 @@ def create_task():
         flash("Задача создана", "success")
         return redirect(url_for("main.tasks"))
 
-    # если валидация не прошла — покажем список снова с ошибками
     items = Task.query.filter_by(user_id=current_user.id).all()
     return render_template("tasks/index.html", form=form, tasks=items, categories=categories, show="all" )
 
@@ -146,12 +144,10 @@ def delete_task(task_id):
 @main_bp.route("/stats")
 @login_required
 def stats():
-    # 1. Считаем общее количество
     total = Task.query.filter_by(user_id=current_user.id).count()
     done = Task.query.filter_by(user_id=current_user.id, is_done=True).count()
     open_tasks = total - done
 
-    # 2. Считаем выполненные задачи по дням (последние 7 дней)
     from datetime import datetime, timedelta
     today = datetime.utcnow().date()
     days = [today - timedelta(days=i) for i in range(6, -1, -1)]  # последние 7 дней
