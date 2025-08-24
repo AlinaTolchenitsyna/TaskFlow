@@ -102,24 +102,30 @@ def create_task():
 @login_required
 def edit_task(task_id):
     task = Task.query.filter_by(id=task_id, user_id=current_user.id).first_or_404()
-    form = TaskForm(obj=task)
     categories = Category.query.filter_by(user_id=current_user.id).order_by(Category.name.asc()).all()
+    
+    form = TaskForm(obj=task)
     form.category_id.choices = [(0, "Без категории")] + [(c.id, c.name) for c in categories]
-    form.category_id.data = task.category_id or 0
-    form.priority.data = str(task.priority)
+
+    # НЕ устанавливаем form.category_id.data здесь при POST! 
+    # Только если GET (форма открывается первый раз)
+    if request.method == "GET":
+        form.category_id.data = task.category_id or 0
+        form.priority.data = str(task.priority)
 
     if form.validate_on_submit():
         task.title = form.title.data.strip()
         task.description = form.description.data or None
         task.deadline = form.deadline.data
         task.priority = int(form.priority.data)
-        task.category_id = None if form.category_id.data == 0 else form.category_id.data
+        task.category_id = None if form.category_id.data == 0 else int(form.category_id.data)
         task.is_done = bool(form.is_done.data)
         db.session.commit()
         flash("Задача обновлена", "success")
         return redirect(url_for("main.tasks"))
 
     return render_template("tasks/edit.html", form=form, task=task)
+
 
 
 @main_bp.route("/tasks/<int:task_id>/toggle", methods=["POST"])

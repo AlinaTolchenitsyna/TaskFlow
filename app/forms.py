@@ -34,6 +34,8 @@ class TaskForm(FlaskForm):
         validators=[DataRequired()],
     )
     category_id = SelectField("Категория", coerce=int, validators=[Optional()])
+
+    
     is_done = BooleanField("Выполнено")
     submit = SubmitField("Сохранить")
 
