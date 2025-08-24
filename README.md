@@ -35,7 +35,7 @@ docker stop <CONTAINER_ID>
 
 ## Скриншоты
 ### Список задач
-![Список задач](screenshots/tasks.png)
+![Список задач](screenshots/tasks.PNG)
 
 ### Статистика
-![Статистика](screenshots/stats.png)
+![Статистика](screenshots/stats.PNG)
